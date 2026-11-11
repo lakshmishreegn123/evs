@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DrawerZero — E-Waste Audit & Community Drives</title>
+  <link rel="stylesheet" href="style.css">
+  <!-- Chart.js CDN (Step 10) -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <!-- Leaflet CDN (Step 11) -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+</head>
+<body>
+
+  <!-- Step 3 & 4: Navbar with Flexbox and <a href="#add"> links -->
+  <nav>
+    <a href="#home" class="brand">
+      ♻ Drawer<span>Zero</span>
+    </a>
+    <ul class="nav-links">
+      <li><a href="#home">Home</a></li>
+      <li><a href="#add">Add Device</a></li>
+      <li><a href="#drawer">Drawer</a></li>
+      <li><a href="#impact">Impact</a></li>
+      <li><a href="#map">Map</a></li>
+      <li><a href="#about">About (BCS508)</a></li>
+    </ul>
+  </nav>
+
+  <main>
+
+    <!-- Step 9: Community Drive Banner (shown when a PIN >= 5 devices) -->
+    <div id="drive-banner" class="drive-banner">
+      <h3>🌟 Community Drive Alert!</h3>
+      <p id="drive-banner-text">Your area has enough devices for an organized collection drive.</p>
+    </div>
+
+    <!-- Step 3: Section "home" -->
+    <section id="home">
+      <div class="hero">
+        <h1>Empty your drawers. <br><span>Revive rare minerals.</span></h1>
+        <!-- Problem in 2-3 lines -->
+        <p>
+          Millions of unused electronics gather dust in our drawers, leaking toxins or locking away precious minerals. 
+          DrawerZero checks each device against its expected lifespan to tell you whether to keep, repair, or recycle it safely.
+        </p>
+        <!-- Big "Add a Device" button -->
+        <a href="#add" class="btn-add">+ Add a Device</a>
+      </div>
+
+      <!-- Step 3 & 4: 3 Stat Cards in CSS Grid -->
+      <div class="stat-grid">
+        <div class="stat-card">
+          <div class="stat-title">Devices Listed</div>
+          <div id="stat-devices-count" class="stat-val">0</div>
+          <div class="stat-sub">Logged in local storage</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-title">Estimated Mass</div>
+          <div id="stat-kg-count" class="stat-val">0 kg</div>
+          <div class="stat-sub">Based on average device weight</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-title">Metals Recovered</div>
+          <div id="stat-metals-count" class="stat-val">0g Cu</div>
+          <div class="stat-sub">Copper and Gold potential</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Step 3: Section "add" (The device form) -->
+    <section id="add">
+      <div class="form-card">
+        <h2 style="font-size: 1.5rem; margin-bottom: 0.5rem; color: var(--dark-green);">Audit an Electronic Item</h2>
+        <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1.5rem;">
+          Enter device specifications. The milk-packet algorithm will classify it as Keep/Reuse, Repair, or Recycle.
+        </p>
+
+        <form id="device-form">
+          <div class="form-group">
+            <label for="dev-name">Device Name / Model *</label>
+            <input type="text" id="dev-name" placeholder="e.g. OnePlus 6, Dell Latitude, Apple 18W Charger" required>
+          </div>
+
+          <div class="form-group">
+            <label for="dev-type">Device Type *</label>
+            <select id="dev-type" required>
+              <option value="smartphone">Smartphone (4 yrs life)</option>
+              <option value="laptop">Laptop (6 yrs life)</option>
+              <option value="charger">Charger (3 yrs life)</option>
+              <option value="earphones">Earphones (2 yrs life)</option>
+              <option value="tv">Television (10 yrs life)</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="dev-year">Year Bought *</label>
+            <input type="number" id="dev-year" min="1990" max="2026" value="2020" required>
+            <small style="color: var(--text-muted); font-size: 0.75rem;">Cannot be in future.</small>
+          </div>
+
+          <div class="form-group">
+            <label for="dev-condition">Physical Condition *</label>
+            <select id="dev-condition" required>
+              <option value="working">Working</option>
+              <option value="repairable">Repairable (screen/battery issue)</option>
+              <option value="broken">Broken / Dead</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="dev-pin">Postal PIN Code (6-Digits) *</label>
+            <input type="text" id="dev-pin" pattern="^\d{6}$" placeholder="e.g. 560001" value="560001" required>
+            <small style="color: var(--text-muted); font-size: 0.75rem;">Matches /^\d{6}$/ for community drives.</small>
+          </div>
+
+          <button type="submit" class="btn-add" style="width: 100%; text-align: center;">Save Device to Drawer</button>
+        </form>
+      </div>
+    </section>
+
+    <!-- Step 3: Section "drawer" (Table of saved devices) -->
+    <section id="drawer">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+        <div>
+          <h2 style="font-size: 1.5rem; color: var(--dark-green);">Your Electronic Drawer</h2>
+          <p style="font-size: 0.85rem; color: var(--text-muted);">Saved devices and their End-of-Life labels</p>
+        </div>
+        <a href="#add" class="btn-add" style="font-size: 0.9rem; padding: 0.5rem 1rem;">+ Add Device</a>
+      </div>
+
+      <table class="drawer-table">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Device Name</th>
+            <th>Type</th>
+            <th>Year</th>
+            <th>Condition</th>
+            <th>PIN</th>
+            <th>Verdict Label</th>
+          </tr>
+        </thead>
+        <tbody id="drawer-table-body">
+          <!-- Populated by JavaScript -->
+        </tbody>
+      </table>
+    </section>
+
+    <!-- Step 3 & 10: Section "impact" (Charts) -->
+    <section id="impact">
+      <h2 style="font-size: 1.5rem; margin-bottom: 0.5rem; color: var(--dark-green);">Environmental Analytics</h2>
+      <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1.5rem;">
+        Interactive Chart.js visualisations mapping device types and reuse potentials.
+      </p>
+
+      <div class="charts-grid">
+        <div class="chart-box">
+          <h3>Reuse vs Repair vs Recycle</h3>
+          <div style="height: 280px; position: relative;">
+            <canvas id="chart-doughnut"></canvas>
+          </div>
+        </div>
+
+        <div class="chart-box">
+          <h3>Devices by Category</h3>
+          <div style="height: 280px; position: relative;">
+            <canvas id="chart-bar"></canvas>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Step 11: Section "map" (Leaflet map with authorized collection points) -->
+    <section id="map">
+      <h2 style="font-size: 1.5rem; margin-bottom: 0.5rem; color: var(--dark-green);">Authorised Collection Points</h2>
+      <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1.5rem;">
+        Registered with CPCB / KSPCB (Karnataka State Pollution Control Board) under E-Waste Rules.
+      </p>
+
+      <div id="leaflet-map" style="width: 100%; height: 420px; border-radius: 12px; border: 1px solid var(--border);"></div>
+
+      <div style="margin-top: 1rem; padding: 1rem; background: var(--white); border-radius: 10px; font-size: 0.8rem; color: var(--text-muted);">
+        <strong>Sources:</strong> CPCB National E-Waste Portal (cpcb.nic.in) & KSPCB Authorized Recycler Directory (kspcb.karnataka.gov.in).
+      </div>
+    </section>
+
+    <!-- Step 3: Section "about" (BCS508 write-up) -->
+    <section id="about">
+      <div style="background: var(--white); padding: 2rem; border-radius: 16px; border: 1px solid var(--border);">
+        <span style="font-size: 0.75rem; font-weight: 800; background: var(--light); color: var(--dark-green); padding: 0.25rem 0.5rem; border-radius: 4px;">
+          BCS508 Write-Up
+        </span>
+        <h2 style="font-size: 1.8rem; margin: 0.75rem 0 1rem; color: #0f172a;">DrawerZero: Project Documentation</h2>
+
+        <div style="font-size: 0.9rem; line-height: 1.6; color: #334155;">
+          <h3 style="color: var(--dark-green); margin: 1.25rem 0 0.5rem;">1. Problem</h3>
+          <p>Over 60 million tonnes of e-waste are produced annually. Yet 40% of small electronics hoard away in household drawers, risk chemical leakage, and withhold valuable metals like gold, copper, and aluminium from the supply chain.</p>
+
+          <h3 style="color: var(--dark-green); margin: 1.25rem 0 0.5rem;">2. Solution</h3>
+          <p>DrawerZero provides an automated lifecycle audit system. It functions like a milk packet's "use by" date, computing age against standard expected lifespan to prescribe: <strong>Keep / Reuse</strong> (working and under lifespan), <strong>Repair</strong> (fixable defects), or <strong>Recycle</strong> (aged or broken).</p>
+
+          <h3 style="color: var(--dark-green); margin: 1.25rem 0 0.5rem;">3. Tech Stack</h3>
+          <p>HTML5, CSS3 with Flexbox and CSS Grid, JavaScript (ES6+), LocalStorage (key <code>dz_devices</code>), Chart.js (CDN), and Leaflet.js (CDN).</p>
+
+          <h3 style="color: var(--dark-green); margin: 1.25rem 0 0.5rem;">4. Original Feature: Community Drive Threshold</h3>
+          <p>Devices are grouped by 6-digit postal PIN code. When 5 or more devices accumulate in any PIN, an automated community collection drive is scheduled. This resolves the logistical cost and emission barrier of individual transport.</p>
+
+          <h3 style="color: var(--dark-green); margin: 1.25rem 0 0.5rem;">5. Sources & Citations</h3>
+          <p>CPCB E-Waste (Management) Rules 2022, KSPCB Waste Management Cell registers, and UN Global E-Waste Monitor 2024 recovery factors.</p>
+
+          <h3 style="color: var(--dark-green); margin: 1.25rem 0 0.5rem;">6. Benefits</h3>
+          <p>Mitigates heavy metal soil contamination (Pb, Cd, Hg), recovers high-grade urban minerals, and coordinates neighbourhood collective action.</p>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>

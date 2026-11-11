@@ -1,0 +1,6 @@
+{
+  "name": "DrawerZero",
+  "description": "DrawerZero: Smart e-waste inventory, lifecycle audit, recovery calculator, and community drive coordinator for household electronics.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
